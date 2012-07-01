@@ -1,6 +1,9 @@
 # Chai::Jquery::Rails
 
-TODO: Write a gem description
+A simple gem that adds chai-jquery to rails.
+
+Obviously it depends on the chai expectation library which in turn depends on
+the Mocha test library for javascript.
 
 ## Installation
 

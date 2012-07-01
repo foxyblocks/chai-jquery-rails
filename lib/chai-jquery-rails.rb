@@ -3,7 +3,8 @@ require "chai-jquery-rails/version"
 module Chai
   module Jquery
     module Rails
-      # Your code goes here...
+      class Engine < ::Rails::Engine
+      end
     end
   end
 end

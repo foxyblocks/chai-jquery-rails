@@ -3,7 +3,7 @@
 [chai-jquery](https://github.com/chaijs/chai-jquery) is a plugin for
 [chai](http://chaijs.com/) that gives you jquery expectation helpers.
 
-This is a simple gem that adds chai-jquery to rails asset pipline.
+This is a simple gem that adds chai-jquery to the rails asset pipline.
 
 
 ## Installation

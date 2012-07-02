@@ -1,27 +1,41 @@
-# Chai::Jquery::Rails
+# Chai jQuery Rails
 
-A simple gem that adds chai-jquery to rails.
+[chai-jquery](https://github.com/chaijs/chai-jquery) is a plugin for
+[chai](http://chaijs.com/) that gives you jquery expectation helpers.
 
-Obviously it depends on the chai expectation library which in turn depends on
-the Mocha test library for javascript.
+This is a simple gem that adds chai-jquery to rails asset pipline.
+
 
 ## Installation
 
 Add this line to your application's Gemfile:
 
-    gem 'chai-jquery-rails'
+    group :development, :test do
+      gem 'chai-jquery-rails'
+    end
 
 And then execute:
 
     $ bundle
 
-Or install it yourself as:
 
-    $ gem install chai-jquery-rails
+Then in your test files add a sprocket require statement:
 
-## Usage
+  js: `//= require chai-jquery`
 
-TODO: Write usage instructions here
+  coffeescript: `#= require chai-jquery`
+
+This gem also depends on [chai](http://chaijs.com/) which in turn depends on
+[mocha](http://visionmedia.github.com/mocha/).
+The best way to get those is with the
+[konacha gem](https://github.com/jfirebaugh/konacha).
+
+## Kudos
+
+- [chai-jquery](https://github.com/chaijs/chai-jquery) for doing the hard work.
+- [Derek Prior](http://prioritized.net/blog/gemify-assets-for-rails/) for
+  blogging about how to write a gem that includes rails assets.
+
 
 ## Contributing
 

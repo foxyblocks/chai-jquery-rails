@@ -4,13 +4,11 @@ require File.expand_path('../lib/chai-jquery-rails/version', __FILE__)
 Gem::Specification.new do |gem|
   gem.authors       = ["Christian Schlensker"]
   gem.email         = ["christian@cswebartisan.com"]
-  gem.description   = %q{chai jquery plugin}
-  gem.summary       = %q{This is a sumarry}
-  gem.homepage      = ""
+  gem.description   = %q{Adds chai-jquery plugin to rails asset pipeline}
+  gem.summary       = %q{The chai jquery plugin adds jquery related helpers to the chai expectation library}
+  gem.homepage      = "https://github.com/wordofchristian/chai-jquery-rails"
 
   gem.files         = `git ls-files`.split($\)
-  gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
-  gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
   gem.name          = "chai-jquery-rails"
   gem.require_paths = ["lib"]
   gem.version       = Chai::Jquery::Rails::VERSION

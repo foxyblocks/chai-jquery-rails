@@ -9,9 +9,8 @@
       return chaiJquery;
     });
   } else {
-    // Other environment (usually <script> tag): pass into global chai
-    var global = (false || eval)("this");
-    global.chai.use(chaiJquery);
+    // Other environment (usually <script> tag): plug in to global chai instance directly.
+    chai.use(chaiJquery);
   }
 }(function (chai, utils) {
   var inspect = utils.inspect,
@@ -28,30 +27,35 @@
     return el.html();
   };
 
-  chai.Assertion.addMethod('attr', function (name, val) {
-    var actual = flag(this, 'object').attr(name);
+  var props = {attr: 'attribute', css: 'CSS property'};
+  for (var prop in props) {
+    (function (prop, description) {
+      chai.Assertion.addMethod(prop, function (name, val) {
+        var actual = flag(this, 'object')[prop](name);
 
-    if (!flag(this, 'negate') || undefined === val) {
-      this.assert(
-          undefined !== actual
-        , 'expected #{this} to have a #{exp} attribute'
-        , 'expected #{this} not to have a #{exp} attribute'
-        , name
-      );
-    }
+        if (!flag(this, 'negate') || undefined === val) {
+          this.assert(
+              undefined !== actual
+            , 'expected #{this} to have a #{exp} ' + description
+            , 'expected #{this} not to have a #{exp} ' + description
+            , name
+          );
+        }
 
-    if (undefined !== val) {
-      this.assert(
-          val === actual
-        , 'expected #{this} to have a ' + inspect(name) + ' attribute with the value #{exp}, but the value was #{act}'
-        , 'expected #{this} not to have a ' + inspect(name) + ' attribute with the value #{act}'
-        , val
-        , actual
-      );
-    }
+        if (undefined !== val) {
+          this.assert(
+              val === actual
+            , 'expected #{this} to have a ' + inspect(name) + ' ' + description + ' with the value #{exp}, but the value was #{act}'
+            , 'expected #{this} not to have a ' + inspect(name) + ' ' + description + ' with the value #{act}'
+            , val
+            , actual
+          );
+        }
 
-    flag(this, 'object', actual);
-  });
+        flag(this, 'object', actual);
+      });
+    })(prop, props[prop]);
+  }
 
   chai.Assertion.addMethod('data', function (name, val) {
     // Work around a chai bug (https://github.com/logicalparadox/chai/issues/16)
@@ -62,7 +66,7 @@
     var assertion = new chai.Assertion(flag(this, 'object').data());
     if (flag(this, 'negate'))
       assertion = assertion.not;
-    assertion.property(name, val);
+    return assertion.property(name, val);
   });
 
   chai.Assertion.addMethod('class', function (className) {
@@ -127,6 +131,20 @@
             obj.length > 0
           , 'expected ' + inspect(obj.selector) + ' to exist'
           , 'expected ' + inspect(obj.selector) + ' not to exist');
+      } else {
+        _super.apply(this, arguments);
+      }
+    };
+  });
+
+  chai.Assertion.overwriteProperty('empty', function (_super) {
+    return function () {
+      var obj = flag(this, 'object');
+      if (obj instanceof jQuery) {
+        this.assert(
+          obj.is(':empty')
+          , 'expected #{this} to be empty'
+          , 'expected #{this} not to be empty');
       } else {
         _super.apply(this, arguments);
       }

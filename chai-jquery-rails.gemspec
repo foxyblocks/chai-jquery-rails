@@ -13,6 +13,8 @@ Gem::Specification.new do |gem|
   gem.require_paths = ["lib"]
   gem.version       = Chai::Jquery::Rails::VERSION
 
+  gem.add_development_dependency('bundler')
+
   gem.add_dependency "railties", "~> 3.1"
   gem.add_dependency "sprockets"
 end

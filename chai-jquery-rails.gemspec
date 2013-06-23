@@ -15,6 +15,6 @@ Gem::Specification.new do |gem|
 
   gem.add_development_dependency('bundler')
 
-  gem.add_dependency "railties", "~> 3.1"
+  gem.add_dependency "railties", ">= 3.1"
   gem.add_dependency "sprockets"
 end

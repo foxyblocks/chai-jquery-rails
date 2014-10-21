@@ -21,6 +21,26 @@
       flag = utils.flag;
   $ = $ || jQuery;
 
+  var setPrototypeOf = '__proto__' in Object ?
+    function (object, prototype) {
+      object.__proto__ = prototype;
+    } :
+    function (object, prototype) {
+      var excludeNames = /^(?:length|name|arguments|caller)$/;
+
+      function copyProperties(dst, src) {
+        Object.getOwnPropertyNames(src).forEach(function (name) {
+          if (!excludeNames.test(name)) {
+            Object.defineProperty(dst, name,
+              Object.getOwnPropertyDescriptor(src, name));
+          }
+        });
+      }
+
+      copyProperties(object, prototype);
+      copyProperties(object, Object.getPrototypeOf(prototype));
+    };
+
   $.fn.inspect = function (depth) {
     var el = $('<div />').append(this.clone());
     if (depth !== undefined) {
@@ -32,7 +52,7 @@
     return el.html();
   };
 
-  var props = {attr: 'attribute', css: 'CSS property'};
+  var props = {attr: 'attribute', css: 'CSS property', prop: 'property'};
   for (var prop in props) {
     (function (prop, description) {
       chai.Assertion.addMethod(prop, function (name, val) {
@@ -93,33 +113,48 @@
   });
 
   chai.Assertion.addMethod('html', function (html) {
+    var actual = flag(this, 'object').html();
     this.assert(
-        flag(this, 'object').html() === html
-      , 'expected #{this} to have HTML #{exp}'
+        actual === html
+      , 'expected #{this} to have HTML #{exp}, but the HTML was #{act}'
       , 'expected #{this} not to have HTML #{exp}'
       , html
+      , actual
     );
   });
 
   chai.Assertion.addMethod('text', function (text) {
+    var actual = flag(this, 'object').text();
     this.assert(
-        flag(this, 'object').text() === text
-      , 'expected #{this} to have text #{exp}'
+        actual === text
+      , 'expected #{this} to have text #{exp}, but the text was #{act}'
       , 'expected #{this} not to have text #{exp}'
       , text
+      , actual
     );
   });
 
   chai.Assertion.addMethod('value', function (value) {
+    var actual = flag(this, 'object').val();
     this.assert(
         flag(this, 'object').val() === value
-      , 'expected #{this} to have value #{exp}'
+      , 'expected #{this} to have value #{exp}, but the value was #{act}'
       , 'expected #{this} not to have value #{exp}'
       , value
+      , actual
     );
   });
 
-  $.each(['visible', 'hidden', 'selected', 'checked', 'disabled'], function (i, attr) {
+  chai.Assertion.addMethod('descendants', function (selector) {
+    this.assert(
+        flag(this, 'object').has(selector).length > 0
+      , 'expected #{this} to have #{exp}'
+      , 'expected #{this} not to have #{exp}'
+      , selector
+    );
+  });
+
+  $.each(['visible', 'hidden', 'selected', 'checked', 'enabled', 'disabled'], function (i, attr) {
     chai.Assertion.addProperty(attr, function () {
       this.assert(
           flag(this, 'object').is(':' + attr)
@@ -156,26 +191,6 @@
     };
   });
 
-  chai.Assertion.overwriteProperty('be', function (_super) {
-    return function () {
-      var be = function (selector) {
-        var obj = flag(this, 'object');
-        if (obj instanceof $) {
-          this.assert(
-              obj.is(selector)
-            , 'expected #{this} to be #{exp}'
-            , 'expected #{this} not to be #{exp}'
-            , selector
-          );
-        } else {
-          _super.apply(this, arguments);
-        }
-      };
-      be.__proto__ = this;
-      return be;
-    }
-  });
-
   chai.Assertion.overwriteMethod('match', function (_super) {
     return function (selector) {
       var obj = flag(this, 'object');
@@ -192,46 +207,25 @@
     }
   });
 
-  chai.Assertion.overwriteProperty('contain', function (_super) {
-    return function () {
-      _super.call(this);
-      var contain = function (text) {
+  chai.Assertion.overwriteChainableMethod('contain',
+    function (_super) {
+      return function (text) {
         var obj = flag(this, 'object');
         if (obj instanceof $) {
           this.assert(
               obj.is(':contains(\'' + text + '\')')
             , 'expected #{this} to contain #{exp}'
             , 'expected #{this} not to contain #{exp}'
-            , text
-          );
+            , text);
         } else {
-          Function.prototype.apply.call(_super.call(this), this, arguments);
+          _super.apply(this, arguments);
         }
-      };
-      contain.__proto__ = this;
-      return contain;
-    }
-  });
-
-  chai.Assertion.overwriteProperty('have', function (_super) {
-    return function () {
-      var obj = flag(this, 'object');
-      if (obj instanceof $) {
-        var have = function (selector) {
-          this.assert(
-              // Using find() rather than has() to work around a jQuery bug:
-              //   http://bugs.jquery.com/ticket/11706
-              obj.find(selector).length > 0
-            , 'expected #{this} to have #{exp}'
-            , 'expected #{this} not to have #{exp}'
-            , selector
-          );
-        };
-        have.__proto__ = this;
-        return have;
-      } else {
-        _super.call(this);
       }
+    },
+    function(_super) {
+      return function() {
+        _super.call(this);
+      };
     }
-  });
+  );
 }));

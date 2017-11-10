@@ -26,7 +26,7 @@ Then in your test files add a sprocket require statement:
   coffeescript: `#= require chai-jquery`
 
 This gem also depends on [chai](http://chaijs.com/) which in turn depends on
-[mocha](http://visionmedia.github.com/mocha/).
+[mocha](http://mochajs.org/).
 The best way to get those is with the
 [konacha gem](https://github.com/jfirebaugh/konacha).
 
